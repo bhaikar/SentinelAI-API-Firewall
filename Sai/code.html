@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SentinelAI | Cyber Dashboard</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration for SF Pro Fallbacks and Custom Theme -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"SF Pro Display"', '"SF Pro Text"', 'Inter', 'system-ui', 'sans-serif'],
+            mono: ['"SF Pro Mono"', 'monospace'],
+          },
+          colors: {
+            'sentinel-black': '#000000',
+            'sentinel-charcoal': '#1a1a1a',
+            'sentinel-muted': '#888888',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="background-styles">
+    body {
+      background-color: #000000;
+      /* Subtle dark charcoal radial glow top-center */
+      background-image: radial-gradient(circle at top center, #1a1a1a 0%, #000000 70%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Faint white dot grid overlay */
+    .dot-grid-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .main-content {
+      position: relative;
+      z-index: 10;
+    }
+  </style>
+<style data-purpose="component-styles">
+    /* Frosted glass effect for cards */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Colored blobs inside cards */
+    .blob {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      filter: blur(40px);
+      border-radius: 50%;
+      opacity: 0.3;
+      z-index: -1;
+      bottom: -20px;
+      right: -20px;
+    }
+
+    .blob-teal { background: #14b8a6; }
+    .blob-red { background: #ef4444; }
+    .blob-amber { background: #f59e0b; }
+    .blob-green { background: #22c55e; }
+    .blob-blue { background: #3b82f6; }
+
+    /* Nav active indicator */
+    .nav-active {
+      color: #ffffff;
+      position: relative;
+    }
+    .nav-active::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 2px;
+      background: #ffffff;
+      box-shadow: 0 0 8px #ffffff;
+    }
+
+    /* Badge glass */
+    .badge-glass {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+<!-- BEGIN: Grid Overlay -->
+<div aria-hidden="true" class="dot-grid-overlay"></div>
+<!-- END: Grid Overlay -->
+<div class="main-content flex flex-col min-h-screen">
+<!-- BEGIN: Navbar -->
+<nav class="w-full h-16 bg-sentinel-black flex items-center justify-between px-8 border-b border-white border-opacity-5" data-purpose="main-navigation">
+<!-- Brand -->
+<div class="flex items-center gap-3">
+<svg class="text-white" fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+<span class="font-bold tracking-tighter text-lg">SENTINELAI</span>
+</div>
+<!-- Links -->
+<div class="flex gap-10">
+<a class="text-[11px] font-medium tracking-[0.2em] nav-active" href="#">DASHBOARD</a>
+<a class="text-[11px] font-medium tracking-[0.2em] text-sentinel-muted hover:text-white transition-colors" href="#">THREATS</a>
+<a class="text-[11px] font-medium tracking-[0.2em] text-sentinel-muted hover:text-white transition-colors" href="#">ENDPOINTS</a>
+<a class="text-[11px] font-medium tracking-[0.2em] text-sentinel-muted hover:text-white transition-colors" href="#">LOGS</a>
+<a class="text-[11px] font-medium tracking-[0.2em] text-sentinel-muted hover:text-white transition-colors" href="#">SETTINGS</a>
+</div>
+<!-- Status -->
+<div class="flex items-center gap-6">
+<div class="font-mono text-[11px] text-sentinel-muted" id="utc-clock">00:00:00 UTC</div>
+<div class="badge-glass px-3 py-1 rounded-full text-[10px] font-bold tracking-widest flex items-center gap-2">
+<span class="text-green-500 animate-pulse">●</span> FIREWALL ACTIVE
+        </div>
+</div>
+</nav>
+<!-- END: Navbar -->
+<main class="flex-grow flex flex-col px-12 py-16 max-w-[1600px] mx-auto w-full">
+<!-- BEGIN: Hero Section -->
+<header class="mb-12" data-purpose="hero-header">
+<h1 class="text-7xl font-black tracking-tighter mb-4">SECURITY DASHBOARD</h1>
+<div class="flex flex-col gap-1">
+<p class="font-mono text-[11px] text-sentinel-muted tracking-widest uppercase">
+            MAR 9, 2026 // SESSION_ACTIVE // SYSTEM STATUS: <span class="text-white">NOMINAL</span>
+</p>
+</div>
+<div class="w-full h-[1px] bg-white opacity-10 mt-8"></div>
+</header>
+<!-- END: Hero Section -->
+<!-- BEGIN: Metrics Grid -->
+<section class="grid grid-cols-5 gap-6" data-purpose="metrics-display">
+<!-- Card 1: Teal -->
+<div class="glass-card h-48 p-6 flex flex-col justify-between">
+<div class="blob blob-teal"></div>
+<div class="flex flex-col"><span class="text-[10px] font-bold tracking-widest text-sentinel-muted uppercase">TOTAL REQUESTS</span><span class="text-2xl font-light mt-1">124</span></div>
+<div class="font-mono text-[10px] opacity-40">REQUESTS RECEIVED</div>
+</div>
+<!-- Card 2: Red -->
+<div class="glass-card h-48 p-6 flex flex-col justify-between">
+<div class="blob blob-red"></div>
+<div class="flex flex-col"><span class="text-[10px] font-bold tracking-widest text-sentinel-muted uppercase">BLOCKED REQUESTS</span><span class="text-2xl font-light mt-1">18</span></div>
+<div class="font-mono text-[10px] opacity-40">MALICIOUS BLOCKED</div>
+</div>
+<!-- Card 3: Amber -->
+<div class="glass-card h-48 p-6 flex flex-col justify-between">
+<div class="blob blob-amber"></div>
+<div class="flex flex-col"><span class="text-[10px] font-bold tracking-widest text-sentinel-muted uppercase">SUSPICIOUS</span><span class="text-2xl font-light mt-1">9</span></div>
+<div class="font-mono text-[10px] opacity-40">FLAGGED FOR REVIEW</div>
+</div>
+<!-- Card 4: Green -->
+<div class="glass-card h-48 p-6 flex flex-col justify-between">
+<div class="blob blob-green"></div>
+<div class="flex flex-col"><span class="text-[10px] font-bold tracking-widest text-sentinel-muted uppercase">ALLOWED</span><span class="text-2xl font-light mt-1">97</span></div>
+<div class="font-mono text-[10px] opacity-40">NORMAL TRAFFIC</div>
+</div>
+<!-- Card 5: Blue -->
+<div class="glass-card h-48 p-6 flex flex-col justify-between">
+<div class="blob blob-blue"></div>
+<div class="flex flex-col"><span class="text-[10px] font-bold tracking-widest text-sentinel-muted uppercase">SECURITY SCORE</span><span class="text-2xl font-light mt-1">84/100</span></div>
+<div class="font-mono text-[10px] opacity-40">STABLE</div>
+</div>
+</section>
+<!-- END: Metrics Grid -->
+<!-- BEGIN: Content Placeholder -->
+<section class="mt-12 flex-grow" data-purpose="dashboard-details"><div class="glass-card w-full p-8 flex flex-col relative min-h-[450px]"><div class="blob blob-blue opacity-10 -bottom-10 -left-10 w-80 h-80"></div><div class="flex justify-between items-start mb-8"><div class="flex flex-col gap-1"><span class="text-[10px] font-bold tracking-[0.2em] text-sentinel-muted uppercase">THREAT DETECTION</span><h2 class="text-2xl font-bold text-white">Request Activity</h2></div><div class="flex bg-white bg-opacity-5 rounded-lg p-1"><button class="px-4 py-1.5 text-[10px] font-bold rounded-md bg-white text-black">24H</button><button class="px-4 py-1.5 text-[10px] font-bold text-sentinel-muted hover:text-white transition-colors">7D</button></div></div><div class="flex-grow flex gap-4"><div class="flex flex-col justify-between py-2 text-[10px] font-mono text-sentinel-muted opacity-60"><span>10k</span><span>7.5k</span><span>5k</span><span>2.5k</span><span>0</span></div><div class="flex-grow relative mt-2"><svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 1000 300"><path d="M0,200 Q150,150 300,180 T600,120 T1000,50" fill="none" stroke="white" stroke-width="2"></path><path d="M0,250 Q150,230 300,240 T600,210 T1000,180" fill="none" stroke="#f59e0b" stroke-dasharray="4 4" stroke-width="1.5"></path><path d="M0,280 Q150,270 300,275 T600,260 T1000,240" fill="none" stroke="#ef4444" stroke-dasharray="4 4" stroke-width="1.5"></path></svg></div></div><div class="flex justify-between items-center mt-6"><div class="flex gap-8"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-white"></span><span class="text-[10px] font-bold tracking-widest uppercase">ALLOWED</span></div><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-500"></span><span class="text-[10px] font-bold tracking-widest uppercase text-sentinel-muted">SUSPICIOUS</span></div><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-red-500"></span><span class="text-[10px] font-bold tracking-widest uppercase text-sentinel-muted">BLOCKED</span></div></div><div class="flex justify-between w-[calc(100%-64px)] ml-auto text-[10px] font-mono text-sentinel-muted opacity-60"><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span><span>24:00</span></div></div></div></section><section class="mt-6 grid grid-cols-2 gap-6" data-purpose="additional-insights">
+<!-- Left Column: Attack Distribution -->
+<div class="glass-card p-8 flex flex-col relative min-h-[400px]">
+<!-- Background Glow -->
+<div class="absolute -bottom-10 -right-10 w-64 h-64 bg-violet-600 blur-[80px] opacity-10 rounded-full"></div>
+<!-- Header -->
+<div class="mb-8">
+<span class="text-[10px] font-bold tracking-[0.2em] text-sentinel-muted uppercase">ATTACK DISTRIBUTION</span>
+<h2 class="text-2xl font-bold text-white">Threat Breakdown</h2>
+</div>
+<!-- Chart Content -->
+<div class="flex items-center justify-between flex-grow">
+<!-- Donut Chart -->
+<div class="relative w-48 h-48">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<!-- SQL Injection (35%) -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#ffffff" stroke-dasharray="219.9" stroke-dashoffset="0" stroke-width="12"></circle>
+<!-- XSS (22%) -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#cccccc" stroke-dasharray="138.2 251.3" stroke-dashoffset="-77" stroke-width="12"></circle>
+<!-- Unauthorized Access (18%) -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#b33333" stroke-dasharray="113.1 251.3" stroke-dashoffset="-125.4" stroke-width="12"></circle>
+<!-- Payload Manipulation (15%) -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#b38333" stroke-dasharray="94.2 251.3" stroke-dashoffset="-165" stroke-width="12"></circle>
+<!-- Rate Abuse (10%) -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#338888" stroke-dasharray="62.8 251.3" stroke-dashoffset="-196.4" stroke-width="12"></circle>
+</svg>
+<!-- Center Text -->
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-4xl font-bold text-white leading-none">48</span>
+<span class="text-[8px] font-bold text-sentinel-muted tracking-widest uppercase mt-1">TOTAL ATTACKS</span>
+</div>
+</div>
+<!-- Legend -->
+<div class="flex flex-col gap-4 pr-4">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-white"></span>
+<div class="flex flex-col">
+<span class="text-[11px] font-medium text-white">SQL Injection</span>
+<span class="text-[10px] text-sentinel-muted">35%</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-[#ccc]"></span>
+<div class="flex flex-col">
+<span class="text-[11px] font-medium text-white">XSS</span>
+<span class="text-[10px] text-sentinel-muted">22%</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-[#b33]"></span>
+<div class="flex flex-col">
+<span class="text-[11px] font-medium text-white">Unauthorized Access</span>
+<span class="text-[10px] text-sentinel-muted">18%</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-[#b83]"></span>
+<div class="flex flex-col">
+<span class="text-[11px] font-medium text-white">Payload Manipulation</span>
+<span class="text-[10px] text-sentinel-muted">15%</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-[#388]"></span>
+<div class="flex flex-col">
+<span class="text-[11px] font-medium text-white">Rate Abuse</span>
+<span class="text-[10px] text-sentinel-muted">10%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Reserved for future use -->
+<div class="glass-card p-8 flex flex-col relative min-h-[400px]">
+<!-- Header -->
+<div class="mb-6">
+<span class="text-[10px] font-bold tracking-[0.2em] text-sentinel-muted uppercase">ENDPOINT RISK</span>
+<h2 class="text-2xl font-bold text-white">API Targets</h2>
+</div>
+<!-- Table Content -->
+<div class="flex-grow overflow-hidden">
+<table class="w-full text-left">
+<thead>
+<tr class="border-b border-white border-opacity-5">
+<th class="pb-3 text-[10px] font-bold tracking-widest text-sentinel-muted uppercase">ENDPOINT</th>
+<th class="pb-3 text-[10px] font-bold tracking-widest text-sentinel-muted uppercase">REQUESTS</th>
+<th class="pb-3 text-[10px] font-bold tracking-widest text-sentinel-muted uppercase">BLOCKED</th>
+<th class="pb-3 text-[10px] font-bold tracking-widest text-sentinel-muted uppercase">RISK</th>
+</tr>
+</thead>
+<tbody class="font-mono text-[11px]">
+<tr class="border-b border-white border-opacity-5">
+<td class="py-4 text-white">/login</td>
+<td class="py-4 text-sentinel-muted">45</td>
+<td class="py-4 text-sentinel-muted">8</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded bg-orange-500 bg-opacity-20 text-orange-400 text-[9px] font-bold">HIGH</span>
+</td>
+</tr>
+<tr class="border-b border-white border-opacity-5">
+<td class="py-4 text-white">/admin</td>
+<td class="py-4 text-sentinel-muted">12</td>
+<td class="py-4 text-sentinel-muted">7</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded bg-red-500 bg-opacity-20 text-red-400 text-[9px] font-bold">CRITICAL</span>
+</td>
+</tr>
+<tr class="border-b border-white border-opacity-5">
+<td class="py-4 text-white">/payment</td>
+<td class="py-4 text-sentinel-muted">20</td>
+<td class="py-4 text-sentinel-muted">3</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded bg-amber-500 bg-opacity-20 text-amber-400 text-[9px] font-bold">MEDIUM</span>
+</td>
+</tr>
+<tr class="border-b border-white border-opacity-5">
+<td class="py-4 text-white">/profile</td>
+<td class="py-4 text-sentinel-muted">30</td>
+<td class="py-4 text-sentinel-muted">0</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded bg-white bg-opacity-10 text-sentinel-muted text-[9px] font-bold">LOW</span>
+</td>
+</tr>
+<tr>
+<td class="py-4 text-white">/api/data</td>
+<td class="py-4 text-sentinel-muted">17</td>
+<td class="py-4 text-sentinel-muted">0</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded bg-white bg-opacity-10 text-sentinel-muted text-[9px] font-bold">LOW</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section><section class="mt-6 flex gap-6" data-purpose="live-logs-summary">
+<!-- Component 6: Live Activity (Existing, modified width to flex-grow) -->
+<div class="glass-card flex-grow p-8 flex flex-col relative border-t-2 border-t-[#3b82f6] shadow-[0_-4px_10px_rgba(59,130,246,0.2)]">
+<div class="blob blob-teal opacity-10 -bottom-10 -left-10 w-64 h-64"></div>
+<div class="flex justify-between items-start mb-8">
+<div class="flex flex-col">
+<span class="text-[10px] font-bold tracking-[0.2em] text-sentinel-muted uppercase font-sans">REQUEST LOGS</span>
+<h2 class="text-2xl font-bold text-white font-sans">Live Activity</h2>
+</div>
+<div class="flex items-center gap-2 font-mono text-[10px] text-red-500/80">
+<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+<span class="tracking-widest uppercase">LIVE</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-white border-opacity-10">
+<th class="pb-3 text-[10px] font-bold tracking-widest text-sentinel-muted uppercase font-sans">TIME</th>
+<th class="pb-3 text-[10px] font-bold tracking-widest text-sentinel-muted uppercase font-sans">ENDPOINT</th>
+<th class="pb-3 text-[10px] font-bold tracking-widest text-sentinel-muted uppercase font-sans">METHOD</th>
+<th class="pb-3 text-[10px] font-bold tracking-widest text-sentinel-muted uppercase font-sans">RISK SCORE</th>
+<th class="pb-3 text-[10px] font-bold tracking-widest text-sentinel-muted uppercase font-sans">STATUS</th>
+<th class="pb-3 text-[10px] font-bold tracking-widest text-sentinel-muted uppercase font-sans">REASON</th>
+</tr>
+</thead>
+<tbody class="font-mono text-[11px]">
+<tr class="border-b border-white border-opacity-5 bg-red-500/5">
+<td class="py-3 text-sentinel-muted">12:01</td>
+<td class="py-3 text-white">/login</td>
+<td class="py-3 text-sentinel-muted">POST</td>
+<td class="py-3 text-red-400">85</td>
+<td class="py-3"><span class="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 text-[9px] font-bold border border-red-500/20">BLOCKED</span></td>
+<td class="py-3 text-sentinel-muted">SQL Injection</td>
+</tr>
+<tr class="border-b border-white border-opacity-5 bg-red-500/5">
+<td class="py-3 text-sentinel-muted">12:03</td>
+<td class="py-3 text-white">/admin</td>
+<td class="py-3 text-sentinel-muted">GET</td>
+<td class="py-3 text-red-400">91</td>
+<td class="py-3"><span class="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 text-[9px] font-bold border border-red-500/20">BLOCKED</span></td>
+<td class="py-3 text-sentinel-muted">Unauthorized Access</td>
+</tr>
+<tr class="border-b border-white border-opacity-5">
+<td class="py-3 text-sentinel-muted">12:05</td>
+<td class="py-3 text-white">/profile</td>
+<td class="py-3 text-sentinel-muted">GET</td>
+<td class="py-3 text-white">12</td>
+<td class="py-3"><span class="px-2 py-0.5 rounded-full bg-white/10 text-white/80 text-[9px] font-bold border border-white/10">ALLOWED</span></td>
+<td class="py-3 text-sentinel-muted">Normal</td>
+</tr>
+<tr class="border-b border-white border-opacity-5 bg-amber-500/5">
+<td class="py-3 text-sentinel-muted">12:06</td>
+<td class="py-3 text-white">/login</td>
+<td class="py-3 text-sentinel-muted">POST</td>
+<td class="py-3 text-amber-400">67</td>
+<td class="py-3"><span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[9px] font-bold border border-amber-500/20">SUSPICIOUS</span></td>
+<td class="py-3 text-sentinel-muted">Unusual Pattern</td>
+</tr>
+<tr class="border-b border-white border-opacity-5">
+<td class="py-3 text-sentinel-muted">12:08</td>
+<td class="py-3 text-white">/payment</td>
+<td class="py-3 text-sentinel-muted">POST</td>
+<td class="py-3 text-white">23</td>
+<td class="py-3"><span class="px-2 py-0.5 rounded-full bg-white/10 text-white/80 text-[9px] font-bold border border-white/10">ALLOWED</span></td>
+<td class="py-3 text-sentinel-muted">Normal</td>
+</tr>
+<tr class="border-b border-white border-opacity-5 bg-red-500/5">
+<td class="py-3 text-sentinel-muted">12:09</td>
+<td class="py-3 text-white">/admin</td>
+<td class="py-3 text-sentinel-muted">POST</td>
+<td class="py-3 text-red-400">95</td>
+<td class="py-3"><span class="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 text-[9px] font-bold border border-red-500/20">BLOCKED</span></td>
+<td class="py-3 text-sentinel-muted">Payload Attack</td>
+</tr>
+<tr>
+<td class="py-3 text-sentinel-muted">12:11</td>
+<td class="py-3 text-white">/api/data</td>
+<td class="py-3 text-sentinel-muted">GET</td>
+<td class="py-3 text-white">8</td>
+<td class="py-3"><span class="px-2 py-0.5 rounded-full bg-white/10 text-white/80 text-[9px] font-bold border border-white/10">ALLOWED</span></td>
+<td class="py-3 text-sentinel-muted">Normal</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Component: AI Threat Summary Panel (30% width) -->
+<div class="glass-card w-[30%] p-8 flex flex-col relative border-l-2 border-l-white/20">
+<div class="blob blob-teal opacity-20 -top-5 -right-5 w-40 h-40"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold tracking-[0.2em] text-sentinel-muted uppercase">AI THREAT SUMMARY</span>
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-[8px] font-bold tracking-widest rounded">AI POWERED</span>
+</div>
+</div>
+</div>
+<div class="flex-grow">
+<p class="font-mono text-[11px] text-white/70 leading-relaxed mb-6">
+        Detected recurring SQL injection patterns originating from decentralized IP clusters. Heuristic analysis suggests a coordinated slow-brute-force attempt on the /login endpoint.
+      </p>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
+<span class="font-mono text-[10px] text-white">SQL Injection</span>
+<span class="text-[9px] font-bold text-red-500">ACTIVE</span>
+</div>
+<div class="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
+<span class="font-mono text-[10px] text-white">Unauthorized Access</span>
+<span class="text-[9px] font-bold text-green-500">BLOCKED</span>
+</div>
+<div class="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
+<span class="font-mono text-[10px] text-white">Rate Abuse</span>
+<span class="text-[9px] font-bold text-amber-500">MONITORING</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-white/5 flex flex-col gap-3">
+<span class="font-mono text-[9px] text-sentinel-muted">LAST UPDATED: 17:52:03 UTC</span>
+<button class="w-full py-2 border border-white/10 hover:bg-white/5 transition-colors text-[10px] font-bold tracking-widest text-white rounded uppercase">
+        REGENERATE
+      </button>
+</div>
+</div>
+</section><section class="mt-6 grid grid-cols-2 gap-6" data-purpose="risk-and-simulator">
+<!-- Component: Request Risk Gauge Panel -->
+<div class="glass-card p-8 flex flex-col items-center relative overflow-hidden">
+<div class="blob blob-amber opacity-10 bottom-0 left-1/2 -translate-x-1/2 w-64 h-32"></div>
+<div class="w-full flex flex-col gap-1 mb-4">
+<span class="text-[10px] font-bold tracking-[0.2em] text-sentinel-muted uppercase">RISK LEVEL</span>
+<h2 class="text-2xl font-bold text-white">Current Threat Status</h2>
+</div>
+<div class="relative w-64 h-32 mt-4">
+<svg class="w-full h-full" viewbox="0 0 100 50">
+<path d="M10,50 A40,40 0 0,1 90,50" fill="none" stroke="#14b8a6" stroke-dasharray="125.6" stroke-dashoffset="0" stroke-width="6"></path>
+<path d="M10,50 A40,40 0 0,1 90,50" fill="none" stroke="#f59e0b" stroke-dasharray="125.6" stroke-dashoffset="83.7" stroke-width="6"></path>
+<path d="M10,50 A40,40 0 0,1 90,50" fill="none" stroke="#ef4444" stroke-dasharray="125.6" stroke-dashoffset="110" stroke-width="6"></path>
+<!-- Needle -->
+<line stroke="white" stroke-width="2" transform="rotate(30, 50, 50)" x1="50" x2="50" y1="50" y2="15"></line>
+<circle cx="50" cy="50" fill="white" r="3"></circle>
+</svg>
+<div class="absolute bottom-0 left-0 right-0 flex justify-between px-2 text-[8px] font-bold text-sentinel-muted uppercase">
+<span>LOW</span>
+<span>HIGH</span>
+</div>
+</div>
+<div class="text-center mt-4">
+<div class="text-4xl font-black text-white">MEDIUM</div>
+<div class="font-mono text-[9px] text-amber-500 tracking-widest mt-1">ELEVATED ACTIVITY DETECTED</div>
+</div>
+</div>
+<!-- Component: Attack Simulation Controls Panel -->
+<div class="glass-card p-8 flex flex-col relative">
+<div class="blob blob-red opacity-10 -top-10 -right-10 w-64 h-64"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold tracking-[0.2em] text-sentinel-muted uppercase">ATTACK SIMULATOR</span>
+<h2 class="text-2xl font-bold text-white">Demo Controls</h2>
+</div>
+<span class="px-2 py-0.5 bg-red-500/20 text-red-500 text-[9px] font-bold tracking-widest rounded">FOR DEMO ONLY</span>
+</div>
+<div class="grid grid-cols-2 gap-3 flex-grow">
+<button class="border border-red-500/40 hover:bg-red-500/10 transition-colors py-3 rounded-lg flex flex-col items-center justify-center gap-1">
+<span class="text-[9px] font-bold text-white tracking-widest">SIMULATE SQL INJECTION</span>
+<span class="text-[7px] text-red-400/60 font-mono">CRITICAL</span>
+</button>
+<button class="border border-amber-500/40 hover:bg-amber-500/10 transition-colors py-3 rounded-lg flex flex-col items-center justify-center gap-1">
+<span class="text-[9px] font-bold text-white tracking-widest">SIMULATE XSS</span>
+<span class="text-[7px] text-amber-400/60 font-mono">MEDIUM</span>
+</button>
+<button class="border border-orange-500/40 hover:bg-orange-500/10 transition-colors py-3 rounded-lg flex flex-col items-center justify-center gap-1">
+<span class="text-[9px] font-bold text-white tracking-widest">SIMULATE RATE ABUSE</span>
+<span class="text-[7px] text-orange-400/60 font-mono">HIGH</span>
+</button>
+<button class="border border-red-500/40 hover:bg-red-500/10 transition-colors py-3 rounded-lg flex flex-col items-center justify-center gap-1">
+<span class="text-[9px] font-bold text-white tracking-widest">SIMULATE UNAUTH ACCESS</span>
+<span class="text-[7px] text-red-400/60 font-mono">CRITICAL</span>
+</button>
+<button class="border border-amber-500/40 hover:bg-amber-500/10 transition-colors py-3 rounded-lg flex flex-col items-center justify-center gap-1 col-span-2">
+<span class="text-[9px] font-bold text-white tracking-widest">SIMULATE PAYLOAD ATTACK</span>
+<span class="text-[7px] text-amber-400/60 font-mono">MEDIUM</span>
+</button>
+</div>
+<div class="mt-6 font-mono text-[9px] text-sentinel-muted text-center tracking-tighter">
+      SIMULATIONS TRIGGER REAL FIREWALL RESPONSES
+    </div>
+</div>
+</section><section class="mt-6 w-full">
+<div class="glass-card p-4 flex justify-between items-center">
+<div class="flex flex-col px-8 border-r border-white/10">
+<span class="text-[9px] font-medium text-sentinel-muted uppercase font-sans tracking-[0.2em]">SERVER STATUS</span>
+<span class="text-lg font-bold text-green-500 font-sans">ONLINE</span>
+</div>
+<div class="flex flex-col px-8 border-r border-white/10">
+<span class="text-[9px] font-medium text-sentinel-muted uppercase font-sans tracking-[0.2em]">API UPTIME</span>
+<span class="text-lg font-bold text-white font-sans">99.8%</span>
+</div>
+<div class="flex flex-col px-8 border-r border-white/10">
+<span class="text-[9px] font-medium text-sentinel-muted uppercase font-sans tracking-[0.2em]">ENDPOINTS PROTECTED</span>
+<span class="text-lg font-bold text-white font-sans">12</span>
+</div>
+<div class="flex flex-col px-8">
+<span class="text-[9px] font-medium text-sentinel-muted uppercase font-sans tracking-[0.2em]">TOTAL THREATS TODAY</span>
+<span class="text-lg font-bold text-white font-sans">48</span>
+</div>
+</div>
+</section>
+<!-- END: Content Placeholder -->
+</main><footer class="w-full bg-black border-t border-white/10 py-6 px-12 flex justify-between items-center relative z-20">
+<div class="text-[10px] font-medium text-sentinel-muted tracking-widest font-sans">
+    © 2024 SENTINELAI SYSTEMS
+  </div>
+<div class="text-[10px] font-mono text-sentinel-muted/60 tracking-[0.3em] uppercase">
+    ENCRYPTION_MODE: <span class="text-white/40">AES-256-GCM</span>
+</div>
+</footer>
+</div>
+<script data-purpose="real-time-clock">
+    /**
+     * Updates the UTC clock in the navbar
+     */
+    function updateClock() {
+      const clockElement = document.getElementById('utc-clock');
+      const now = new Date();
+      const h = String(now.getUTCHours()).padStart(2, '0');
+      const m = String(now.getUTCMinutes()).padStart(2, '0');
+      const s = String(now.getUTCSeconds()).padStart(2, '0');
+      clockElement.textContent = `${h}:${m}:${s} UTC`;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body></html>
