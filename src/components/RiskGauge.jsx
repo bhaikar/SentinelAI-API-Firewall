@@ -4,7 +4,6 @@
 import { useState } from 'react'
 import { ResponsiveContainer, RadialBarChart, RadialBar } from 'recharts'
 import { Sparkles } from 'lucide-react'
-import { stats, endpoints } from '../data/mockData'
 import { getRiskRecommendation } from '../services/aiService'
 
 const ZONES = [
@@ -19,7 +18,7 @@ const needleRad = ((180 - NEEDLE_ANGLE) * Math.PI) / 180
 const nx = cx + r * Math.cos(needleRad)
 const ny = cy - r * Math.sin(needleRad)
 
-export default function RiskGauge() {
+export default function RiskGauge({ stats, endpoints }) {
   const [recommendation, setRecommendation] = useState(null)
   const [loading, setLoading]               = useState(false)
   const [error, setError]                   = useState(false)

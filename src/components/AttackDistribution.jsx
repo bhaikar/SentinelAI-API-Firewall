@@ -5,9 +5,6 @@ import { useEffect, useState } from 'react'
 import {
   ResponsiveContainer, PieChart, Pie, Cell, Tooltip,
 } from 'recharts'
-import { attackTypes } from '../data/mockData'
-
-const TOTAL = attackTypes.reduce((s, d) => s + d.value, 0)
 
 function CustomTooltip({ active, payload }) {
   if (!active || !payload?.length) return null
@@ -44,8 +41,9 @@ function useTotalCountUp(target, duration = 1200, startDelay = 600) {
   return count
 }
 
-export default function AttackDistribution() {
-  const animatedTotal = useTotalCountUp(TOTAL)
+export default function AttackDistribution({ attackTypes }) {
+  const total = attackTypes.reduce((s, d) => s + d.value, 0)
+  const animatedTotal = useTotalCountUp(total)
 
   return (
     <div className="glass-card p-6 relative overflow-hidden">

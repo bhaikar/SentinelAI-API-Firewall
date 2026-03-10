@@ -3,7 +3,6 @@
 
 import { useState } from 'react'
 import { Sparkles } from 'lucide-react'
-import { requestLogs } from '../data/mockData'
 import { getLogAnalysis } from '../services/aiService'
 
 const STATUS_BADGE = {
@@ -18,7 +17,7 @@ const ROW_STYLE = {
   ALLOWED:    { className: '',                      borderLeft: '2px solid transparent'           },
 }
 
-export default function LiveRequestLogs() {
+export default function LiveRequestLogs({ logs }) {
   const [analysis, setAnalysis] = useState(null)
   const [loading, setLoading]   = useState(false)
   const [aiError, setAiError]   = useState(false)
@@ -28,7 +27,7 @@ export default function LiveRequestLogs() {
     setLoading(true)
     setAiError(false)
     try {
-      const text = await getLogAnalysis(requestLogs)
+      const text = await getLogAnalysis(logs)
       setAnalysis(text)
     } catch {
       setAiError(true)
@@ -103,7 +102,7 @@ export default function LiveRequestLogs() {
           </tr>
         </thead>
         <tbody>
-          {requestLogs.map((log, i) => {
+          {logs.map((log, i) => {
             const style = ROW_STYLE[log.status]
             return (
               <tr

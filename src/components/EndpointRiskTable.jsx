@@ -1,7 +1,6 @@
 // ─── EndpointRiskTable ────────────────────────────────────────────────────────
 // Half-width table showing per-endpoint request + risk data
 
-import { endpoints } from '../data/mockData'
 
 const RISK_STYLE = {
   CRITICAL: 'bg-red-500/20 text-red-400 border border-red-500/30',
@@ -10,7 +9,7 @@ const RISK_STYLE = {
   LOW:      'bg-white/5 text-white/40 border border-white/10',
 }
 
-export default function EndpointRiskTable() {
+export default function EndpointRiskTable({ endpoints }) {
   return (
     <div className="glass-card p-6 relative overflow-hidden">
       {/* Blob accent */}

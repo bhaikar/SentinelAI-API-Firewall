@@ -1,14 +1,31 @@
 // ─── SystemInfo ───────────────────────────────────────────────────────────────
 // Full-width bottom status bar + copyright footer
 
-const SYS_STATS = [
-  { label: 'SERVER STATUS', value: 'ONLINE',             color: 'text-green-400' },
-  { label: 'API UPTIME',    value: '99.8%',              color: 'text-white'     },
-  { label: 'ENDPOINTS PROTECTED', value: '12',           color: 'text-white'     },
-  { label: 'TOTAL THREATS TODAY', value: '48',           color: 'text-red-400'   },
-]
+function formatUptime(seconds) {
+  if (!seconds && seconds !== 0) return '—'
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  return `${h}h ${m}m`
+}
 
-export default function SystemInfo() {
+export default function SystemInfo({ systemStatus }) {
+  const isOnline = systemStatus?.status === 'active'
+
+  const SYS_STATS = [
+    {
+      label: 'SERVER STATUS',
+      value: systemStatus ? (isOnline ? 'ONLINE' : 'OFFLINE') : 'ONLINE',
+      color: isOnline || !systemStatus ? 'text-green-400' : 'text-red-400',
+    },
+    {
+      label: 'API UPTIME',
+      value: systemStatus ? formatUptime(systemStatus.uptime) : '—',
+      color: 'text-white',
+    },
+    { label: 'ENDPOINTS PROTECTED', value: '12',  color: 'text-white'   },
+    { label: 'TOTAL THREATS TODAY', value: '48',  color: 'text-red-400' },
+  ]
+
   return (
     <div className="flex flex-col gap-0">
       {/* Stats bar */}

@@ -1,10 +1,10 @@
 // ─── AIThreatSummary ──────────────────────────────────────────────────────────
-// Fetches live threat summary from Grok AI on mount + regenerate click.
-// Falls back to mock text if the AI server is unavailable.
+// Fetches live threat summary from AI server on mount + regenerate click.
+// Falls back gracefully if AI server is unavailable.
 
 import { useState, useEffect, useRef } from 'react'
-import { Sparkles, RefreshCw } from 'lucide-react'
-import { threatSummary, stats, attackTypes, endpoints } from '../data/mockData'
+import { Sparkles, RefreshCw, Loader2 } from 'lucide-react'
+import { threatSummary } from '../data/mockData'
 import { getThreatSummary } from '../services/aiService'
 
 const INDICATOR_STYLE = {
@@ -43,34 +43,20 @@ function useTypewriter(text, speed = 16, startDelay = 300) {
   return { displayed, done }
 }
 
-export default function AIThreatSummary() {
-  const [summaryText, setSummaryText] = useState(threatSummary.text)
-  const [regenerating, setRegenerating] = useState(false)
-  const [aiError, setAiError]           = useState(false)
+export default function AIThreatSummary({ stats, attackTypes, endpoints }) {
+  const [summaryText, setSummaryText] = useState("Analyzing threat patterns...")
+  const [loading, setLoading]         = useState(false)
   const { displayed, done } = useTypewriter(summaryText, 16, 800)
 
-  // ── Fetch from Grok AI ──────────────────────────────────────────────────────
-  const fetchSummary = async () => {
-    setRegenerating(true)
-    setAiError(false)
-    try {
-      const text = await getThreatSummary(stats, attackTypes, endpoints)
-      setSummaryText(text)
-    } catch {
-      setAiError(true)
-      // Fallback: cycle between two mock summaries
-      setSummaryText(
-        summaryText === threatSummary.text
-          ? "Continued SQL injection activity on /login. Pattern analysis suggests automated tooling. Admin endpoint under brute-force pressure — IP rate-limiting recommended. All critical endpoints remain under active monitoring."
-          : threatSummary.text
-      )
-    } finally {
-      setRegenerating(false)
-    }
+  const generateSummary = async () => {
+    setLoading(true)
+    const result = await getThreatSummary(stats, attackTypes, endpoints)
+    setSummaryText(result)
+    setLoading(false)
   }
 
   // Fetch on mount
-  useEffect(() => { fetchSummary() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { generateSummary() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="glass-card p-6 flex flex-col gap-4 relative overflow-hidden">
@@ -91,22 +77,24 @@ export default function AIThreatSummary() {
         </div>
       </div>
 
-      {/* AI error pill */}
-      {aiError && (
-        <span className="text-[9px] text-amber-400/70 tracking-wider">
-          ⚠ AI server offline — showing cached summary
-        </span>
-      )}
-
       {/* Typewriter text */}
       <p
         className="text-xs leading-relaxed transition-opacity duration-300 min-h-[80px]"
-        style={{ color: 'rgba(255,255,255,0.6)', opacity: regenerating ? 0.2 : 1 }}
+        style={{ color: 'rgba(255,255,255,0.6)', opacity: loading ? 0.2 : 1 }}
       >
-        {displayed}
-        {!done && !regenerating && (
-          <span className="inline-block w-[6px] h-[12px] bg-white/50 ml-0.5 align-middle"
-                style={{ animation: 'cursorBlink 1.1s step-end infinite' }} />
+        {loading ? (
+          <span className="flex items-center gap-1.5 text-white/30 italic">
+            <Loader2 size={10} className="spin" />
+            Analysing with Grok AI…
+          </span>
+        ) : (
+          <>
+            {displayed}
+            {!done && (
+              <span className="inline-block w-[6px] h-[12px] bg-white/50 ml-0.5 align-middle"
+                    style={{ animation: 'cursorBlink 1.1s step-end infinite' }} />
+            )}
+          </>
         )}
       </p>
 
@@ -134,16 +122,19 @@ export default function AIThreatSummary() {
 
       {/* Regenerate button */}
       <button
-        onClick={fetchSummary}
-        disabled={regenerating}
+        onClick={generateSummary}
+        disabled={loading}
         className="w-full border border-white/10 hover:border-white/20 rounded-lg py-2
                    text-[10px] font-semibold tracking-[0.18em] uppercase text-white/50
                    hover:text-white/80 transition-all bg-white/[0.02] hover:bg-white/[0.05]
                    disabled:opacity-40 disabled:cursor-not-allowed
                    flex items-center justify-center gap-2"
       >
-        <RefreshCw size={10} className={regenerating ? 'spin' : ''} />
-        {regenerating ? 'Analysing…' : 'Regenerate'}
+        {loading
+          ? <Loader2 size={10} className="spin" />
+          : <RefreshCw size={10} />
+        }
+        {loading ? 'Analysing…' : 'Regenerate'}
       </button>
     </div>
   )

@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { label: 'Settings',  target: 'settings'  },
 ]
 
-export default function Navbar() {
+export default function Navbar({ isLive }) {
   const [time, setTime]     = useState('')
   const [active, setActive] = useState('dashboard')
 
@@ -101,6 +101,17 @@ export default function Navbar() {
               Firewall Active
             </span>
           </div>
+
+          {/* Live / Demo indicator */}
+          {isLive ? (
+            <span className="text-[10px] font-semibold tracking-[0.15em] uppercase text-green-400">
+              ● LIVE
+            </span>
+          ) : (
+            <span className="text-[10px] font-semibold tracking-[0.15em] uppercase text-white/30">
+              ● DEMO
+            </span>
+          )}
         </div>
 
       </div>

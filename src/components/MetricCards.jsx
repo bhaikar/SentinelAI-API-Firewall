@@ -2,15 +2,14 @@
 // Count-up + blob float + hover lift + AI micro-insight below each number
 
 import { useEffect, useState } from 'react'
-import { stats } from '../data/mockData'
 import { getCardInsights } from '../services/aiService'
 
-const CARDS = [
-  { label: 'TOTAL REQUESTS',   numVal: stats.totalRequests,  suffix: '',     sub: 'REQUESTS RECEIVED', blurClr: 'rgba(45,212,191,0.18)',  delay: 200, insightKey: 'totalRequests' },
-  { label: 'BLOCKED REQUESTS', numVal: stats.blocked,        suffix: '',     sub: 'MALICIOUS BLOCKED', blurClr: 'rgba(239,68,68,0.18)',   delay: 300, insightKey: 'blocked'       },
-  { label: 'SUSPICIOUS',       numVal: stats.suspicious,     suffix: '',     sub: 'FLAGGED FOR REVIEW',blurClr: 'rgba(251,191,36,0.18)',  delay: 400, insightKey: 'suspicious'    },
-  { label: 'ALLOWED',          numVal: stats.allowed,        suffix: '',     sub: 'NORMAL TRAFFIC',    blurClr: 'rgba(74,222,128,0.18)',  delay: 500, insightKey: 'allowed'       },
-  { label: 'SECURITY SCORE',   numVal: stats.securityScore,  suffix: '/100', sub: 'STABLE',            blurClr: 'rgba(96,165,250,0.18)',  delay: 600, insightKey: 'score'         },
+const CARD_META = [
+  { label: 'TOTAL REQUESTS',   key: 'totalRequests', suffix: '',     sub: 'REQUESTS RECEIVED', blurClr: 'rgba(45,212,191,0.18)',  delay: 200, insightKey: 'totalRequests' },
+  { label: 'BLOCKED REQUESTS', key: 'blocked',       suffix: '',     sub: 'MALICIOUS BLOCKED', blurClr: 'rgba(239,68,68,0.18)',   delay: 300, insightKey: 'blocked'       },
+  { label: 'SUSPICIOUS',       key: 'suspicious',    suffix: '',     sub: 'FLAGGED FOR REVIEW',blurClr: 'rgba(251,191,36,0.18)',  delay: 400, insightKey: 'suspicious'    },
+  { label: 'ALLOWED',          key: 'allowed',       suffix: '',     sub: 'NORMAL TRAFFIC',    blurClr: 'rgba(74,222,128,0.18)',  delay: 500, insightKey: 'allowed'       },
+  { label: 'SECURITY SCORE',   key: 'securityScore', suffix: '/100', sub: 'STABLE',            blurClr: 'rgba(96,165,250,0.18)',  delay: 600, insightKey: 'score'         },
 ]
 
 // Count-up hook: 0 → target with ease-out cubic
@@ -68,7 +67,7 @@ function StatCard({ card, insight }) {
   )
 }
 
-export default function MetricCards() {
+export default function MetricCards({ stats }) {
   const [insights, setInsights] = useState(null)
 
   // Fetch AI insights once on mount
@@ -78,9 +77,11 @@ export default function MetricCards() {
       .catch(() => {}) // silently fall back to static sub-labels
   }, [])
 
+  const cards = CARD_META.map(meta => ({ ...meta, numVal: stats[meta.key] }))
+
   return (
     <div className="grid grid-cols-5 gap-4">
-      {CARDS.map(card => (
+      {cards.map(card => (
         <StatCard
           key={card.label}
           card={card}

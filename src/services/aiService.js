@@ -1,52 +1,75 @@
-// ─── aiService.js ─────────────────────────────────────────────────────────────
-// Thin fetch wrappers for every AI Server endpoint.
-// All functions throw on network failure so callers can catch + show fallback.
+// ─── aiService.js ────────────────────────────────────────────────────────────
+// Fetch wrappers for the AI server at localhost:3001.
+// All functions catch internally and return fallback values — never throw.
 
-const AI_SERVER = 'http://localhost:3001/api'
-
-// ── Helper ─────────────────────────────────────────────────────────────────────
-async function post(path, body) {
-  const res  = await fetch(`${AI_SERVER}${path}`, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(body),
-  })
-  const data = await res.json()
-  if (!data.success) throw new Error(data.error || 'AI server error')
-  return data
-}
-
-// ── Exports ────────────────────────────────────────────────────────────────────
+const AI_URL = 'http://localhost:3001/api'
 
 export async function getThreatSummary(stats, attackTypes, endpoints) {
-  const data = await post('/threat-summary', {
-    stats,
-    attackTypes,
-    topEndpoints: endpoints,
-  })
-  return data.summary
+  try {
+    const res = await fetch(`${AI_URL}/threat-summary`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stats, attackTypes, topEndpoints: endpoints })
+    })
+    const data = await res.json()
+    return data.summary
+  } catch {
+    return "AI analysis temporarily unavailable."
+  }
 }
 
 export async function getAttackAnalysis(attackType, endpoint, riskScore) {
-  const data = await post('/attack-analysis', { attackType, endpoint, riskScore })
-  return data.analysis
+  try {
+    const res = await fetch(`${AI_URL}/attack-analysis`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attackType, endpoint, riskScore })
+    })
+    const data = await res.json()
+    return data.analysis
+  } catch {
+    return "AI analysis temporarily unavailable."
+  }
 }
 
 export async function getCardInsights(stats) {
-  const data = await post('/card-insights', { stats })
-  return data.insights   // { totalRequests, blocked, suspicious, allowed, score }
+  try {
+    const res = await fetch(`${AI_URL}/card-insights`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stats })
+    })
+    const data = await res.json()
+    return data.insights
+  } catch {
+    return null
+  }
 }
 
 export async function getRiskRecommendation(riskLevel, stats, endpoints) {
-  const data = await post('/risk-recommendation', {
-    riskLevel,
-    stats,
-    topEndpoints: endpoints,
-  })
-  return data.recommendation
+  try {
+    const res = await fetch(`${AI_URL}/risk-recommendation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ riskLevel, stats, topEndpoints: endpoints })
+    })
+    const data = await res.json()
+    return data.recommendation
+  } catch {
+    return "AI recommendation temporarily unavailable."
+  }
 }
 
 export async function getLogAnalysis(logs) {
-  const data = await post('/log-analysis', { logs })
-  return data.analysis
+  try {
+    const res = await fetch(`${AI_URL}/log-analysis`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ logs })
+    })
+    const data = await res.json()
+    return data.analysis
+  } catch {
+    return "AI analysis temporarily unavailable."
+  }
 }
