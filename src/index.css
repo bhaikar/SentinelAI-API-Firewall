@@ -1,0 +1,308 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ════════════════════════════════════════
+   Base reset + scroll behaviour
+════════════════════════════════════════ */
+html {
+  scroll-padding-top: 80px; /* offset for sticky navbar height */
+  scroll-behavior: smooth;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ════════════════════════════════════════
+   Body — black + top glow + dot-grid
+   + very subtle animated bg shift
+════════════════════════════════════════ */
+body {
+  background-color: #000000;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, #1a1a2e 0%, transparent 70%),
+    radial-gradient(circle, #ffffff08 1px, transparent 1px);
+  background-size: 200% 200%, 28px 28px;
+  animation: bgShift 20s ease-in-out infinite;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont,
+    'SF Pro Display', 'SF Pro Text', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+@keyframes bgShift {
+  0%, 100% { background-position: 0% 0%, 0% 0%; }
+  50%       { background-position: 100% 100%, 0% 0%; }
+}
+
+/* ════════════════════════════════════════
+   Frosted glass card
+════════════════════════════════════════ */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Card hover — border brightens, lifts subtly */
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 0 20px rgba(255, 255, 255, 0.05),
+    inset 0 0 20px rgba(255, 255, 255, 0.01);
+}
+
+/* ════════════════════════════════════════
+   Metric card — extra lift on hover
+════════════════════════════════════════ */
+.metric-card {
+  cursor: default;
+}
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 20px rgba(255, 255, 255, 0.08),
+    inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+
+/* ════════════════════════════════════════
+   Page-load stagger — fadeSlideUp
+════════════════════════════════════════ */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.anim-enter {
+  opacity: 0;
+  animation: fadeSlideUp 0.6s ease forwards;
+}
+
+/* Delay utility classes */
+.delay-0   { animation-delay: 0ms;   }
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+.delay-700 { animation-delay: 700ms; }
+.delay-800 { animation-delay: 800ms; }
+.delay-900 { animation-delay: 900ms; }
+
+/* ════════════════════════════════════════
+   Hero title glow
+════════════════════════════════════════ */
+.hero-title {
+  text-shadow:
+    0 0 40px rgba(255, 255, 255, 0.15),
+    0 0 80px rgba(255, 255, 255, 0.05);
+}
+
+/* ════════════════════════════════════════
+   Terminal cursor blink
+════════════════════════════════════════ */
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.cursor-blink::after {
+  content: '█';
+  font-size: 0.75em;
+  margin-left: 3px;
+  vertical-align: middle;
+  animation: cursorBlink 1.1s step-end infinite;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ════════════════════════════════════════
+   Blob float animation
+════════════════════════════════════════ */
+@keyframes blobFloat {
+  0%, 100% { transform: scale(1)   translate(0px,  0px);  }
+  50%       { transform: scale(1.1) translate(4px, -4px); }
+}
+.blob-float {
+  animation: blobFloat 6s ease-in-out infinite;
+}
+
+/* ════════════════════════════════════════
+   Firewall badge green-dot pulse glow
+════════════════════════════════════════ */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 4px #22c55e; }
+  50%       { box-shadow: 0 0 12px #22c55e, 0 0 24px #22c55e66; }
+}
+.glow-dot {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* ════════════════════════════════════════
+   Nav link animated underline
+════════════════════════════════════════ */
+.nav-link {
+  position: relative;
+  overflow: hidden;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: white;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.25s ease;
+}
+.nav-link.nav-active::after {
+  transform: scaleX(1);
+}
+
+/* ════════════════════════════════════════
+   LIVE dot pulse
+════════════════════════════════════════ */
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1);   }
+  50%       { opacity: 0.5; transform: scale(1.4); }
+}
+.live-dot {
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+
+/* ════════════════════════════════════════
+   Log row slide-in from top
+════════════════════════════════════════ */
+@keyframes rowSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.log-row {
+  animation: rowSlideIn 0.35s ease forwards;
+}
+
+/* ════════════════════════════════════════
+   Needle sweep (RiskGauge)
+════════════════════════════════════════ */
+@keyframes needleSweep {
+  from { transform: rotate(-80deg); }
+  to   { transform: rotate(0deg);   }
+}
+.needle-group {
+  transform-origin: 110px 120px;
+  animation: needleSweep 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) 400ms both;
+}
+
+/* ════════════════════════════════════════
+   Amber glow text (MEDIUM label)
+════════════════════════════════════════ */
+.amber-glow {
+  text-shadow: 0 0 20px #ffaa0066, 0 0 40px #ffaa0033;
+}
+
+/* ════════════════════════════════════════
+   Attack button ripple
+════════════════════════════════════════ */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+.btn-ripple::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.12) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.btn-ripple:active::before {
+  opacity: 1;
+}
+
+/* ════════════════════════════════════════
+   Indicator badge pulse (AI summary)
+════════════════════════════════════════ */
+@keyframes badgePulse {
+  0%, 100% { opacity: 1;   }
+  50%       { opacity: 0.6; }
+}
+.badge-active {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+/* ════════════════════════════════════════
+   Spinning regen icon
+════════════════════════════════════════ */
+@keyframes spin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+/* ════════════════════════════════════════
+   Scrollbar
+════════════════════════════════════════ */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.20);
+}
+
+/* ════════════════════════════════════════
+   AI Toast animations
+════════════════════════════════════════ */
+@keyframes toastSlideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes toastFadeOut {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(8px); opacity: 0; }
+}
+@keyframes toastProgress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+@keyframes recPanelIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.toast-enter {
+  animation: toastSlideIn 400ms ease-out forwards;
+}
+.toast-exit {
+  animation: toastFadeOut 300ms ease-in forwards;
+}
+.toast-progress {
+  animation: toastProgress 6s linear forwards;
+}
+.rec-panel-enter {
+  animation: recPanelIn 250ms ease-out forwards;
+}
+
+/* ════════════════════════════════════════
+   Recharts overrides
+════════════════════════════════════════ */
+.recharts-wrapper,
+.recharts-surface        { overflow: visible !important; }
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical   line {
+  stroke: rgba(255, 255, 255, 0.06) !important;
+}
+.recharts-tooltip-wrapper { outline: none !important; }

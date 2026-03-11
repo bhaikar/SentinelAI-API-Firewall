@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+.DS_Store
+.vite/
+npm-debug.log
+SentiTest/sentinelai/node_modules/
+AI/node_modules/
